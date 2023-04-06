@@ -90,7 +90,7 @@ Na próxima terça feira (11/04) iremos modificar o código implementado para in
 
 Segue um diagrama ilustrando a solução a ser implementada:
 
-![image](https://user-images.githubusercontent.com/10417566/230458615-9014266f-e747-45e5-97f7-8e92ea939e86.png)
+![image](https://user-images.githubusercontent.com/10417566/230461230-e342e511-6fc6-4e13-9c1a-0958815cdef5.png)
 
 Utilizem o codespaces para realizar o exercício.
 
