@@ -88,5 +88,9 @@ Na próxima terça feira (11/04) iremos modificar o código implementado para in
 * 1 thread produtora, responsável por monitorar arquivos existentes e novos arquivos na pasta `input` e incluir o nome do arquivo correspondente em um buffer de tamanho limitado
 * $n$ threads consumidoras, responsáveis por aplicar o filtro _box blur_ em cada novo arquivo incluído no buffer e salvar o arquivo resultante no diretório `output`
 
+Segue um diagrama ilustrando a solução a ser implementada:
+
+![image](https://user-images.githubusercontent.com/10417566/230458615-9014266f-e747-45e5-97f7-8e92ea939e86.png)
+
 Utilizem o codespaces para realizar o exercício.
 
