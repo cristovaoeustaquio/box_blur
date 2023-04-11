@@ -92,5 +92,7 @@ Segue um diagrama ilustrando a solução a ser implementada:
 
 ![image](https://user-images.githubusercontent.com/10417566/230461230-e342e511-6fc6-4e13-9c1a-0958815cdef5.png)
 
+Um codigo de referência do padrão produtor-consumidor está disponível no moodle (`produtor_consumidor_var_condicao.cpp`).
+
 Utilizem o codespaces para realizar o exercício.
 
