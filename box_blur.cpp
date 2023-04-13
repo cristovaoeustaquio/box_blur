@@ -24,7 +24,6 @@ std::condition_variable space_available;
 // O produtor utiliza essa variável de condição para notificar o consumidor que a fila não está vazia
 std::condition_variable data_available;
 
-
 // Numero de threads produtoras e consumidoras a serem criadas no main()
 static const unsigned NUM_PRODUCERS = 1;
 static const unsigned NUM_CONSUMERS = 10;
@@ -93,7 +92,6 @@ void write_image(const string &filename, const image_t &image)
     }
 }
 
-
 single_channel_image_t apply_box_blur(const single_channel_image_t &image, const int filter_size)
 {
     // Get the dimensions of the input image
@@ -151,20 +149,20 @@ string buffer[BUFFER_SIZE];
 static unsigned counter = 0;
 unsigned in = 0, out = 0;
 
-void add_buffer(string i)
+void add_buffer(string picture)
 {
-  buffer[in] = i;
+  buffer[in] = picture;
   in = (in+1) % BUFFER_SIZE;
   counter++;
 }
 
 string get_buffer()
 {
-  string v;
-  v = buffer[out];
+  string picture;
+  picture = buffer[out];
   out = (out+1) % BUFFER_SIZE;
   counter--;
-  return v;
+  return picture;
 }
 //  ==========================================================================================
 
@@ -196,7 +194,6 @@ void producer_func(string INPUT_DIRECTORY)
         exit(1);
     }
 
-    auto start_time = chrono::high_resolution_clock::now();
     for (auto &file : filesystem::directory_iterator{INPUT_DIRECTORY})
     {
         // Cria um objeto do tipo unique_lock que no construtor chama m.lock()
@@ -209,7 +206,7 @@ void producer_func(string INPUT_DIRECTORY)
 		}
         string input_image_path = file.path().string();
         add_buffer(input_image_path);
-        // Notifica o consumirod que existem dados a serem consumidos no buffer
+        // Notifica o consumidor que existem dados a serem consumidos no buffer
 		data_available.notify_one();
         if (SLEEP_TIME > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
@@ -217,12 +214,8 @@ void producer_func(string INPUT_DIRECTORY)
 		// Verifica a integridade do buffer, ou seja, verifica se o número de elementos do buffer (counter)
 		// é menor ou igual a BUFFER_SIZE
 		assert(counter <= BUFFER_SIZE);
-
-        //clog << "Processing image: " << input_image_path << endl;
     }
-    auto end_time = chrono::high_resolution_clock::now();
-    auto elapsed_time = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
-    cout << "Elapsed time: " << elapsed_time.count() << " ms" << endl;
+    
 }
 
 // Consumer
@@ -253,7 +246,7 @@ void consumer_func()
         string output_image_path = input_image_path.replace(input_image_path.find(INPUT_DIRECTORY), INPUT_DIRECTORY.length(), OUTPUT_DIRECTORY);
         write_image(output_image_path, output_image);
 
-		//std::cout << "Consumer " << id << " - consumed: " << i << " - Buffer counter: " << counter << std::endl;
+		std::cout << "Consumer " << std::this_thread::get_id() << " - consumed: " << output_image_path << " - Buffer counter: " << counter << std::endl;
 
 		space_available.notify_one();
 		
@@ -273,7 +266,7 @@ int main(int argc, char *argv[])
     // Cria NUM_PRODUCER thread produtoras  e NUM_CONSUMER threads consumidoras
 	std::vector<std::thread> producers;
 	std::vector<std::thread> consumers;
-
+    auto start_time = chrono::high_resolution_clock::now();
 	for (unsigned i =0; i < NUM_PRODUCERS; ++i)
 	{
 		producers.push_back(std::thread(producer_func, INPUT_DIRECTORY));
@@ -281,10 +274,13 @@ int main(int argc, char *argv[])
 	for (unsigned i =0; i < NUM_CONSUMERS; ++i)
 	{
 		consumers.push_back(std::thread(consumer_func));
-        consumers[i].join();
 	}
-
-	
+    for (int i = 0; i < sizeof(consumers); i++){
+        consumers[i].join();
+    }
     producers[0].join();
+    auto end_time = chrono::high_resolution_clock::now();
+    auto elapsed_time = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
+	cout << "Elapsed time: " << elapsed_time.count() << " ms" << endl;
     return 0;
 }
